@@ -2,7 +2,7 @@ from flask import Blueprint, abort,make_response,request,Response
 # from app.models.book import planet
 from app.models.planet import Planet
 from ..db import db
-
+from sqlalchemy import cast, String
 
 planet_bp = Blueprint("planet_bp", __name__, url_prefix="/planets")
 
@@ -29,7 +29,24 @@ def create_planet():
 
 @planet_bp.get("")
 def get_all_planets():
-    query = db.select(Planet).order_by(Planet.id)
+    query = db.select(Planet)
+
+    name_param = request.args.get("name")
+    if name_param:
+        query = query.where(Planet.name.ilike(f"%{name_param}%"))
+        
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Planet.description.ilike(f"%{description_param}%"))
+        
+        
+    distance_from_sun_param = request.args.get("distance_from_sun")
+    if distance_from_sun_param:
+        query = query.where(cast(Planet.distance_from_sun, String).ilike(f"%{distance_from_sun_param}%"))
+
+    query = query.order_by(Planet.id)
+    
+    
     planets = db.session.scalars(query)
     # We could also write the line above as:
     # books = db.session.execute(query).scalars()
@@ -46,7 +63,7 @@ def get_all_planets():
     return planets_response
 
 @planet_bp.get("/<planet_id>")
-def get_one_book(planet_id):
+def get_one_planet(planet_id):
     planet = validate_planet(planet_id)
 
     return dict(
