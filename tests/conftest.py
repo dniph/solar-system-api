@@ -40,7 +40,4 @@ def two_saved_planets(app):
     venus = Planet(name="Venus", description="Venus as a boy",distance_from_sun=85)
 
     db.session.add_all([lulu_moon, venus])
-    # Alternatively, we could do
-    # db.session.add(ocean_book)
-    # db.session.add(mountain_book)
     db.session.commit()

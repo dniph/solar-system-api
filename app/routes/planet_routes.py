@@ -22,13 +22,7 @@ def create_planet():
     db.session.add(new_planet)
     db.session.commit()
     
-    response = dict(
-            id = new_planet.id,
-            name = new_planet.name,
-            description = new_planet.description,
-            distance_from_sun = new_planet.distance_from_sun
-            )
-    return response, 201
+    return new_planet.to_dict(), 201
 
 
 @planet_bp.get("")
@@ -56,27 +50,16 @@ def get_all_planets():
     # books = db.session.execute(query).scalars()
 
     planets_response = []
+    
     for planet in planets:
-        planets_response.append(dict(
-            id = planet.id,
-            name = planet.name,
-            description = planet.description,
-            distance_from_sun = planet.distance_from_sun
-            
-            ))
+        planets_response.append(planet.to_dict())
     return planets_response
 
 @planet_bp.get("/<planet_id>")
 def get_one_planet(planet_id):
     planet = validate_planet(planet_id)
 
-    return dict(
-            id = planet.id,
-            name = planet.name,
-            description = planet.description,
-            distance_from_sun = planet.distance_from_sun
-            
-            )
+    return planet.to_dict()
 
 def validate_planet(planet_id):
     try:
