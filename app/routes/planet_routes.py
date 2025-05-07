@@ -10,11 +10,15 @@ planet_bp = Blueprint("planet_bp", __name__, url_prefix="/planets")
 @planet_bp.post("")
 def create_planet():
     request_body = request.get_json()
-    name = request_body["name"]
-    description = request_body["description"]
-    distance_from_sun = request_body["distance_from_sun"]
+    try:
+        new_planet = Planet.from_dict(request_body)
+        
+    except KeyError as error:
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+        
     
-    new_planet = Planet(name=name, description=description, distance_from_sun=distance_from_sun )
+    
     db.session.add(new_planet)
     db.session.commit()
     
